@@ -1,0 +1,28 @@
+{
+  "name": "matchmaker",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "node --test helper/validate.test.mjs",
+    "configure": "node scripts/configure.mjs",
+    "helper": "node helper/server.mjs",
+    "phone": "npm --prefix phone start -- --lan --port 8081"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SOPH-a-CAT/Soph-a-Cats_MatchMaker.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/SOPH-a-CAT/Soph-a-Cats_MatchMaker/issues"
+  },
+  "homepage": "https://github.com/SOPH-a-CAT/Soph-a-Cats_MatchMaker#readme",
+  "devDependencies": {
+    "qrcode": "^1.5.4"
+  },
+  "private": true
+}

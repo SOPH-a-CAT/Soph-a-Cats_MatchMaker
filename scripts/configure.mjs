@@ -1,0 +1,12 @@
+import {networkInterfaces} from 'node:os';
+import {randomBytes} from 'node:crypto';
+import {writeFileSync,existsSync,readFileSync} from 'node:fs';
+const network=networkInterfaces();
+const candidates=Object.entries(network).filter(([name])=>!name.startsWith('utun')).flatMap(([,rows])=>rows||[]);
+const host=candidates.find(x=>x.family==='IPv4'&&!x.internal&&/^(192\.168\.|10\.|172\.(1[6-9]|2\d|3[01])\.)/.test(x.address))?.address;
+if(!host)throw Error('Connect this computer to Wi-Fi, then try again.');
+const file=new URL('../phone/local-config.json',import.meta.url);
+const token=existsSync(file)?JSON.parse(readFileSync(file)).token:randomBytes(24).toString('hex');
+writeFileSync(file,JSON.stringify({helperUrl:`http://${host}:8787`,token}),{mode:0o600});
+console.log(`Phone helper address: http://${host}:8787`);
+console.log(`Expo LAN link: exp://${host}:8081`);
