@@ -1,0 +1,12 @@
+{
+  "installCommand": "npm ci && npm ci --prefix phone",
+  "buildCommand": "cd phone && npx expo export -p web --output-dir ../dist",
+  "outputDirectory": "dist",
+  "framework": null,
+  "cleanUrls": true,
+  "functions": {"api/outfit.mjs": {"includeFiles": "{BRIEF.md,NOTES.md}", "maxDuration": 120}},
+  "rewrites": [
+    {"source": "/api/:path*", "destination": "/api/:path*"},
+    {"source": "/:path*", "destination": "/"}
+  ]
+}

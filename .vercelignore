@@ -1,0 +1,8 @@
+.env*
+.runtime/
+phone/local-config.json
+phone/.expo/
+phone/dist/
+node_modules/
+phone/node_modules/
+.git/
