@@ -1,9 +1,10 @@
-import React,{useState,useEffect,useRef} from 'react';
+import React,{useState,useEffect,useRef,useCallback} from 'react';
 import {View,Text,StyleSheet,ScrollView,Pressable,TextInput,Image,Alert,ActivityIndicator,SafeAreaView,Platform} from 'react-native';
 import {StatusBar} from 'expo-status-bar';
 import * as ImagePicker from 'expo-image-picker';
 import {savePhoto} from './save-photo';
 import Frame from './Frame';
+import PhotoCrop from './PhotoCrop';
 import {outfitUrl,requestHeaders} from './ai-connection';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Svg,{Circle,Path} from 'react-native-svg';
@@ -17,10 +18,13 @@ const empty={clothes:[],outfit:[],style:'Flexible'};
 export default function App(){return <Frame><Wardrobe/></Frame>;}
 function Wardrobe(){
  const [data,setData]=useState(empty),[ready,setReady]=useState(false),[status,setStatus]=useState('Opening your wardrobe…'),[busy,setBusy]=useState(false),[draft,setDraft]=useState(/** @type {null | {uri:string,name:string,color:string,type:string}} */(null)),[error,setError]=useState('');
+ const cropped=useRef(null);
+ const updateCrop=useCallback(uri=>{cropped.current=uri;},[]);
  const saving=useRef(Promise.resolve()),requesting=useRef(false),version=useRef(0);
  useEffect(()=>{AsyncStorage.getItem(KEY).then(raw=>{if(raw){const value=JSON.parse(raw);if(!Array.isArray(value.clothes)||!Array.isArray(value.outfit))throw Error();setData(value);}setReady(true);setStatus('Saved on this device');}).catch(()=>setStatus('Could not open saved clothes. Please reopen the app.'));},[]);
  useEffect(()=>{if(!ready)return;const n=++version.current;saving.current=saving.current.catch(()=>{}).then(()=>{setStatus('Saving…');return AsyncStorage.setItem(KEY,JSON.stringify(data));});saving.current.then(()=>{if(version.current===n)setStatus('Saved on this device');}).catch(()=>{if(version.current===n)setStatus('Not saved. Your phone may be out of storage. Keep the app open.');});},[data,ready]);
  async function capture(camera){
+  cropped.current=null;
   try{
    if(camera){const permission=await ImagePicker.requestCameraPermissionsAsync();if(!permission.granted){showAlert('Camera access','Allow camera access in your phone settings, or choose a photo instead.');return;}}
    const result=await (camera?ImagePicker.launchCameraAsync:ImagePicker.launchImageLibraryAsync)({mediaTypes:['images'],quality:.7,allowsEditing:true,exif:false,base64:Platform.OS==='web'});
@@ -30,7 +34,7 @@ function Wardrobe(){
  async function add(){
   if(!draft.name.trim()||!draft.color.trim()){showAlert('A little detail helps','Add a short clothing name and its main color. Photos stay on your phone; these details help the AI match.');return;}
   setBusy(true);
-  try{const id=Date.now().toString();const uri=await savePhoto(draft.uri,id);setData(d=>({...d,clothes:[...d.clothes,{...draft,name:draft.name.trim(),color:draft.color.trim(),uri,id}]}));setDraft(null);}catch(photoError){console.warn('Photo save failed:',photoError?.name,photoError?.message);showAlert('Could not save photo','Please check your phone’s available storage and try again.');}finally{setBusy(false);}
+  try{const id=Date.now().toString();const uri=await savePhoto(cropped.current||draft.uri,id);setData(d=>({...d,clothes:[...d.clothes,{...draft,name:draft.name.trim(),color:draft.color.trim(),uri,id}]}));setDraft(null);}catch(photoError){console.warn('Photo save failed:',photoError?.name,photoError?.message);showAlert('Could not save photo','Please check your phone’s available storage and try again.');}finally{setBusy(false);}
  }
  async function makeOutfit(){
   if(requesting.current)return;
@@ -57,7 +61,7 @@ function Wardrobe(){
  <Text style={s.heading}>Your style</Text><Text style={s.copy}>Optional. Pick what feels like you.</Text><ScrollView horizontal showsHorizontalScrollIndicator={false}>{stylesList.map(st=><Pressable key={st} accessibilityRole="button" accessibilityState={{selected:data.style===st}} onPress={()=>setData(d=>({...d,style:st}))} style={[s.chip,data.style===st&&s.active]}><Text style={data.style===st?{color:'white'}:{color:'#213c39'}}>{st}</Text></Pressable>)}</ScrollView>
  <View style={s.row}><Text style={s.heading}>My wardrobe</Text><Text style={s.copy}>{data.clothes.length} pieces</Text></View><Text style={s.copy}>Lay each piece flat on a plain background. Crop closely. Use clothing-only photos.</Text>
  <Action label="Photograph a piece" action={()=>capture(true)} secondary disabled={busy}/><Action label="Choose a clothing photo" action={()=>capture(false)} secondary disabled={busy}/>
- {draft&&<View style={s.card}><Text style={s.heading}>Add this piece</Text><Image source={{uri:draft.uri}} style={s.draft}/><TextInput accessibilityLabel="Clothing name" style={s.input} maxLength={80} placeholder="Name, e.g. striped cotton shirt" value={draft.name} onChangeText={name=>setDraft(d=>({...d,name}))}/><TextInput accessibilityLabel="Main color" style={s.input} maxLength={40} placeholder="Main color, e.g. blue and white" value={draft.color} onChangeText={color=>setDraft(d=>({...d,color}))}/><View style={s.wrap}>{['Top','Bottom','Shoes','Accessory'].map(type=><Pressable key={type} onPress={()=>setDraft(d=>({...d,type}))} style={[s.chip,draft.type===type&&s.active]}><Text style={draft.type===type?{color:'white'}:{}}>{type}</Text></Pressable>)}</View><Action label="Save piece" action={add} disabled={busy}/><Action label="Cancel" action={()=>setDraft(null)} secondary disabled={busy}/></View>}
+ {draft&&<View style={s.card}><Text style={s.heading}>Add this piece</Text><PhotoCrop source={draft.uri} onChange={updateCrop}/><TextInput accessibilityLabel="Clothing name" style={s.input} maxLength={80} placeholder="Name, e.g. striped cotton shirt" value={draft.name} onChangeText={name=>setDraft(d=>({...d,name}))}/><TextInput accessibilityLabel="Main color" style={s.input} maxLength={40} placeholder="Main color, e.g. blue and white" value={draft.color} onChangeText={color=>setDraft(d=>({...d,color}))}/><View style={s.wrap}>{['Top','Bottom','Shoes','Accessory'].map(type=><Pressable key={type} onPress={()=>setDraft(d=>({...d,type}))} style={[s.chip,draft.type===type&&s.active]}><Text style={draft.type===type?{color:'white'}:{}}>{type}</Text></Pressable>)}</View><Action label="Save piece" action={add} disabled={busy}/><Action label="Cancel" action={()=>setDraft(null)} secondary disabled={busy}/></View>}
  <View style={s.wrap}>{data.clothes.map(c=><View key={c.id} style={s.tile}><Image source={{uri:c.uri}} style={s.thumb}/><Text style={s.pieceLabel}>{c.name}</Text><Text style={s.caption}>{c.type} · {c.color}</Text></View>)}</View>
  {!data.clothes.length&&<Text style={s.empty}>An empty closet, ready for your clothes. Add a top and bottom to begin.</Text>}<Text style={s.privacy}>Taste is personal. This app makes outfit suggestions, not body ratings or safety advice. Local storage is not a backup; clearing app or browser data can remove your wardrobe.</Text></ScrollView></SafeAreaView>;
 }
