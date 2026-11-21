@@ -45,19 +45,19 @@ function Wardrobe(){
    const answer=await response.json();if(!response.ok){setError(typeof answer.error==='string'?answer.error:'Could not make an outfit. Check the helper and Wi-Fi.');return;}
    if(!Array.isArray(answer.ids)||answer.ids.some(id=>!data.clothes.some(c=>c.id===id)))throw Error();
    setData(d=>({...d,outfit:answer.ids}));
-  }catch{setError('Could not make an outfit. Check the API key, Wi-Fi, and that the helper is running on your computer.');}finally{requesting.current=false;setBusy(false);}
+  }catch{setError('Please check your Wi-Fi and that the helper is running, then try again.');}finally{requesting.current=false;setBusy(false);}
  }
  const chosen=data.clothes.filter(c=>data.outfit.includes(c.id));
 
  if(!ready)return <SafeAreaView style={s.page}><Text style={s.copy}>{status}</Text><ActivityIndicator/></SafeAreaView>;
- return <SafeAreaView style={s.page}><StatusBar style="dark"/><ScrollView contentContainerStyle={s.body} keyboardShouldPersistTaps="handled"><Text style={s.logo}>MatchMaker ✳</Text><Text style={s.kicker}>YOUR CLOTHES. A FRESH COMBINATION.</Text><Text style={s.title}>Less guessing.\nMore getting ready.</Text><Text style={s.copy}>Choose from clothes you already own.</Text><Text accessibilityLiveRegion="polite" style={s.status}>{status}</Text>
- <Action label={busy?'Thinking…':'Make an outfit for me'} action={makeOutfit} disabled={busy}/>
+ return <SafeAreaView style={s.page}><StatusBar style="dark"/><ScrollView contentContainerStyle={s.body} keyboardShouldPersistTaps="handled"><Text style={s.logo}>MatchMaker ✳</Text><Text style={s.kicker}>YOUR CLOTHES. A FRESH COMBINATION.</Text><Text style={s.title}>{'Less guessing.\nMore getting ready.'}</Text><Text style={s.copy}>Choose from clothes you already own.</Text><Text accessibilityLiveRegion="polite" style={s.status}>{status}</Text>
+ <Action label={busy?(draft?'Saving…':'Thinking…'):'Make an outfit for me'} action={makeOutfit} disabled={busy}/>
  {!!error&&<Text accessibilityRole="alert" style={s.error}>{error}</Text>}
  <Text style={s.privacy}>Photos stay on this device. When you press the button, only clothing details and your style go to OpenAI through the secure server.</Text>
  <View style={s.board}><Text style={s.heading}>Today’s outfit</Text><View style={s.figure}>
  <Svg width={210} height={330} viewBox="0 0 210 330"><Circle cx="105" cy="28" r="21" fill="#cfccc1"/><Path d="M92 48L118 48 125 62 145 70 161 167 149 171 131 98 126 181 135 307 116 307 105 210 94 307 75 307 84 181 79 98 61 171 49 167 65 70 85 62Z" fill="#cfccc1"/></Svg>
  {chosen.map(c=><Image accessibilityLabel={c.name} key={c.id} source={{uri:c.uri}} resizeMode="contain" style={[s.overlay,c.type==='Top'?s.top:c.type==='Bottom'?s.bottom:c.type==='Shoes'?s.shoes:s.accessory]}/>)}
- </View><Text style={s.caption}>2D outfit layout · not a prediction of fit</Text>{!chosen.length&&<Text style={s.copy}>Your suggested pieces will appear here.</Text>}{chosen.map(c=><Text key={c.id} style={s.pieceLabel}>{c.name} · {c.color}</Text>)}</View>
+ </View><Text style={s.caption}>2D outfit layout · not a prediction of fit</Text>{!chosen.length&&<Text style={s.copy}>Your suggested pieces will appear here.</Text>}{chosen.map(c=><Text key={c.id} style={s.pieceLabel}>{c.name}</Text>)}</View>
  <Text style={s.heading}>Your style</Text><Text style={s.copy}>Optional. Pick what feels like you.</Text><ScrollView horizontal showsHorizontalScrollIndicator={false}>{stylesList.map(st=><Pressable key={st} accessibilityRole="button" accessibilityState={{selected:data.style===st}} onPress={()=>setData(d=>({...d,style:st}))} style={[s.chip,data.style===st&&s.active]}><Text style={data.style===st?{color:'white'}:{color:'#213c39'}}>{st}</Text></Pressable>)}</ScrollView>
  <View style={s.row}><Text style={s.heading}>My wardrobe</Text><Text style={s.copy}>{data.clothes.length} pieces</Text></View><Text style={s.copy}>Lay each piece flat on a plain background. Crop closely. Use clothing-only photos.</Text>
  <Action label="Photograph a piece" action={()=>capture(true)} secondary disabled={busy}/><Action label="Choose a clothing photo" action={()=>capture(false)} secondary disabled={busy}/>

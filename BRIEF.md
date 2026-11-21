@@ -34,7 +34,10 @@ Plan: have a maniquin if they don't want to use their photo, and ensure photos d
 ## My AI’s instructions
 - When it answers: The user presses a button that says make an outfit for me. The ai makes an outfit
 - Its job: To match clothes for the occasion
-- Who it talks to and how to sound: It should not way anywords just match the outfit
-- Facts it must use: Facts about aesthetic and pull facts from the users input /quiz
+- Who it talks to and how to sound: THey are talking to the user and should sound friendly and give helpful suggestions
+- Facts it must use: The clothes the user has saved, including each item’s name, type, and main color.
+The user’s chosen style preferences.
+Basic outfit-matching principles, such as coordinating colors and combining clothing styles.
+Only clothes the user owns—it must not invent items.
 - Rules it must follow: It must never insult someone or take someones privacy
-- How to answer: It should be short
+- How to answer: Show the suggested outfit first, using pictures of the user’s saved clothes. Keep words to a minimum—only clothing names. If something goes wrong, show one short, friendly sentence explaining what to do next.

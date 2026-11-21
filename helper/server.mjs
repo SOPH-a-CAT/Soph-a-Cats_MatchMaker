@@ -6,7 +6,7 @@ import {askAI} from './ask-ai.mjs';
 import {validateInput,validateOutfit} from './validate.mjs';
 const config=JSON.parse(readFileSync(new URL('../phone/local-config.json',import.meta.url)));
 let busy=false,lastCall=0;
-const message='Could not make an outfit. Please check the API key, Wi-Fi, and that the helper is running on your computer.';
+const message='Please check your Wi-Fi and that the helper is running, then try again.';
 http.createServer(async(req,res)=>{
  res.setHeader('Content-Type','application/json');res.setHeader('Cache-Control','no-store');
  const send=(status,data)=>{res.statusCode=status;res.end(JSON.stringify(data));};
