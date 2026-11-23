@@ -7,7 +7,7 @@ import Frame from './Frame';
 import mannequin from './assets/mannequin-ivory.png';
 import PhotoCrop from './PhotoCrop';
 import {outfitUrl,requestHeaders} from './ai-connection';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from './storage';
 
 function showAlert(title,message){if(Platform.OS==='web')window.alert(title+'\n'+message);else Alert.alert(title,message);}
 const KEY='matchmaker-v1';
