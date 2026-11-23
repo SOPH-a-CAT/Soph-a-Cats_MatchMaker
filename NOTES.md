@@ -35,3 +35,14 @@ Scan the QR code with Expo Go SDK 58, add a top and bottom, and press Make an ou
 
 ## Existing web version
 Web support remains available with `cd phone` then `npx expo start --web`. Vercel: repository root, Framework Other, Node 24.x, KEYGEN_URL and KEYGEN_TOKEN as server environment variables. vercel.json sets build/output; api/outfit.mjs shares server-only getKey(). Browser photos use local storage with optional crop controls. No Vercel deployment has been performed. The separate Thread website is a different project.
+
+## Mobile visual refinement
+MatchMaker now uses the Thread website’s sage palette, ivory mannequin asset, bordered outfit panel and two-column wardrobe cards. Style choices expand on demand. Search and category filters help browse saved clothes; tapping a card changes the preview. Clothing entry opens in a separate native modal. Existing storage and real AI connection are retained; SDK remains 58. Native photo background removal and the website’s canvas fabric shaping are not included in this visual update. Type checks, lint, iOS/Android/web export checked; physical-phone appearance still needs review.
+
+## Blue mobile theme
+Blue palette and prominent action buttons match the Thread website. Generate outfit stays in a bottom dock outside the scrolling content. Adjust fit opens a native screen with a stationary mannequin and scrollable position/size controls; changes persist with each clothing item. SDK 58 and AI request timing remain unchanged. Type checks, lint and native/web exports passed; physical-phone review remains pending.
+
+## MVP outfit check — November 23, 2026
+Status: works end to end in the local web app. Tested with an isolated test wardrobe: saved a top and bottom, refreshed, pressed Generate outfit, saw Thinking… with the button disabled, and received a real AI outfit containing only those saved items. The generated outfit also survived a refresh. Empty wardrobes show a helpful message. Test images were simple placeholders in a separate browser origin; the user’s wardrobe was not changed. No app rebuild was needed.
+Checks: nine automated API/key/validation/crop tests passed; TypeScript and Expo lint passed. Physical Expo Go interaction was not tested in this check.
+Try it: (1) Add at least one Top and one Bottom with photos, names and colors. (2) Press Generate outfit and wait for the saved clothing pictures and names to appear.
