@@ -5,7 +5,7 @@ const root=resolve(import.meta.dirname,'..');
 const site=resolve(root,'../sites/thread-wardrobe');
 const target=resolve(site,'matchmaker/phone');
 mkdirSync(target,{recursive:true});
-const files=['App.js','Frame.js','Frame.web.js','PhotoCrop.js','PhotoCrop.web.js','ai-connection.web.js','save-photo.js','save-photo.web.js','storage.js','storage.web.js','migrate-wardrobe.mjs','crop-pixels.mjs','index.js','app.json','package.json','package-lock.json','assets.d.ts'];
+const files=['App.js','Frame.js','Frame.web.js','PhotoCrop.js','PhotoCrop.web.js','ai-connection.web.js','save-photo.js','save-photo.web.js','storage.js','storage.web.js','migrate-wardrobe.mjs','crop-pixels.mjs','crop-editor.mjs','crop-runtime.generated.js','index.js','app.json','package.json','package-lock.json','assets.d.ts'];
 for(const name of files)copyFileSync(resolve(root,'phone',name),resolve(target,name));
 mkdirSync(resolve(target,'assets'),{recursive:true});
 for(const name of readdirSync(resolve(root,'phone/assets')))copyFileSync(resolve(root,'phone/assets',name),resolve(target,'assets',name));

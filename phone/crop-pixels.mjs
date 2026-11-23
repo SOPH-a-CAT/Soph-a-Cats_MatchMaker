@@ -1,8 +1,11 @@
 // Remove only background connected to the image border; preserve enclosed details.
 export function trimBackground(data,width,height,tolerance=30){
  const pixels=new Uint8ClampedArray(data),seen=new Uint8Array(width*height),queue=[];
- const corners=[0,width-1,(height-1)*width,width*height-1];
- const bg=[0,1,2].map(c=>corners.map(i=>data[i*4+c]).sort((a,b)=>a-b)[1]);
+ // Sample the whole border so a dark corner or shadow does not decide the cutout.
+ const border=[];const step=Math.max(1,Math.floor(Math.min(width,height)/40));
+ for(let x=0;x<width;x+=step){border.push(x,(height-1)*width+x);}
+ for(let y=0;y<height;y+=step){border.push(y*width,y*width+width-1);}
+ const bg=[0,1,2].map(c=>{const values=border.filter(i=>data[i*4+3]>20).map(i=>data[i*4+c]).sort((a,b)=>a-b);return values[Math.floor(values.length/2)]||0;});
  const visit=i=>{if(seen[i])return;seen[i]=1;const p=i*4;if(data[p+3]<20||Math.max(...bg.map((v,c)=>Math.abs(data[p+c]-v)))<=tolerance){queue.push(i);pixels[p+3]=0;}};
  for(let x=0;x<width;x++){visit(x);visit((height-1)*width+x);}
  for(let y=0;y<height;y++){visit(y*width);visit(y*width+width-1);}
