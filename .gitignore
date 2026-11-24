@@ -8,3 +8,5 @@ dist/
 phone/local-config.json
 
 .claude/
+
+node_modules

@@ -1,0 +1,2 @@
+import React from 'react';
+export default function Range({label,value,min,max,step=1,onChange}){return <label style={{display:'block',fontFamily:'system-ui, sans-serif',fontSize:14,fontWeight:600,color:'#203e38',margin:'5px 0'}}>{label}<input aria-label={label} type="range" min={min} max={max} step={step} value={value} onChange={e=>onChange(Number(e.target.value))} style={{display:'block',width:'100%',accentColor:'#286b61',height:24}}/></label>;}
